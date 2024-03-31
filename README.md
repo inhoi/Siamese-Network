@@ -41,19 +41,59 @@ Few-shot learning involves training models with very little data, reducing the n
 
 ## Pairwise Learning
 
-* models are trained using pairs of data.
-* In the case of Siamese networks, pairs of images are used, which can be similar or different. When these image pairs are provided as input to the network, the network independently processes each image and then compares their features to calculate similarity.
-* For example, consider using a Siamese network in a facial recognition system. In this scenario, two different facial images can be provided as input to the network. The network processes each image separately and compares their features to determine how similar they are. If the two images are of the same person's face, the network will judge the images to be similar; otherwise, it will judge them to be different.
-* In this manner, Siamese networks learn the similarity between pairs of images, enabling the network to determine the similarity between images.
+* The model is trained using pairs of data.
+* For Siamese networks, they operate using pairs of texts, which can either be similar or dissimilar in content. When these text pairs are provided as input to the network, it processes each text independently and compares their features to calculate similarity.
+* For example, consider using a Siamese network in a text similarity analysis system. Two different sentences could be provided as input to the network. The network processes each sentence independently and compares their features to determine how similar they are. If the two sentences have the same topic or context, the network will consider them similar; otherwise, it will consider them different.
 
 ## Siamese Network
 
-Siamese networks are known for their ability to perform one-shot learning, as they require only one training example for each class. The key feature of these networks is their ability to generate a similarity score between a reference image and a test image. This score, ranging from 0 to 1, indicates the likelihood that the images are of the same person, with 0 denoting no similarity and 1 denoting full similarity.
+* Siamese networks are well known for one-shot learning, requiring only one training example for each class.
+* The key function of these networks is their ability to generate a similarity score between a reference text and a test text. This score ranges from 0 to 1, indicating the likelihood that the two texts have the same topic or context. Here, 0 indicates no similarity, and 1 indicates complete similarity.
 
-The architecture of Siamese networks consists of two or more identical sub-networks, each having the same configuration, parameters, and weights. In practice, only one of the sub-networks is typically trained, and the same configuration is then applied to the other sub-networks. This approach allows Siamese networks to effectively compare images and determine their similarity, making them particularly useful for tasks such as facial recognition and verification in scenarios with limited training data.
+![image](https://github.com/inhoi/Siamese-Network/assets/76868046/2871045d-e137-4eaa-a3f0-9078c86b45bc)
+
+The structure of a Siamese network consists of two or more identical sub-networks with the same configuration, parameters, and weights. In practice, usually only one sub-network is trained, and then the same configuration is applied to the other sub-networks. This approach allows Siamese networks to effectively compare texts and determine similarity, making them useful for text classification, similarity analysis, and verification tasks, especially in scenarios with limited training data.
 
 Example)
 1. First Subnetwork : The first subnetwork takes an image (A) as input and passes it through convolutional layers and fully connected layers to obtain a vector representation of the image.
 2. Second Subnetwork : The second image (B) is passed through a network that is exactly the same as the first one, with the same weights and parameters, to obtain its vector representation.
 3. Encoding Comparison : The two encodings, E(A) and E(B), from the respective images are compared to determine how similar the two images are. If the images are similar, the encodings will also be quite similar.
 4. Distance Measurement : The distance between the two vectors is measured. If the distance is small, the vectors are considered similar or belonging to the same classes. If the distance is larger, the vectors are considered different from one another.
+
+![image](https://github.com/inhoi/Siamese-Network/assets/76868046/c6b508d7-c5d9-407c-b807-f01dd5d32558)
+
+## Contrastive Loss
+
+![image](https://github.com/inhoi/Siamese-Network/assets/76868046/8c4033f2-5123-421e-b2f6-ef28af82fce1)
+
+* Siamese networks, when applied to text, are used to differentiate between text inputs by learning a distance metric, rather than classifying them into categories.
+* They penalize dissimilar text pairs that are too close and similar text pairs that are too far apart in the learned embedding space.
+
+![image](https://github.com/inhoi/Siamese-Network/assets/76868046/95f371e4-5b8f-4bef-88f1-117c9a231d6d)
+
+* Dw is Euclidean distance between the vector representations (embeddings) of text produced by the network.
+* Y is a binary indicator with a value of 0 when two text inputs are from the same category (similar) and 1 when they are from different categories (dissimilar).
+* max() ifunction is used to choose the greater value between 0 and the difference between the margin, m-dw, effectively applying a zero loss to dissimilar pairs that are sufficiently apart.
+* m is a hyperparameter greater than zero. It ensures that dissimilar text pairs that are beyond this margin do not contribute to the loss, providing a buffer zone within the embedding space.
+
+## Triplet Loss
+
+* Allow our model to map two similar texts close and far from dissimilar sample text pairs.
+  
+![image](https://github.com/inhoi/Siamese-Network/assets/76868046/f69f81f0-0119-4995-9d96-8290be11c458)
+
+1. Anchor — This is a sample text.
+
+2. Positive — This is just another variation of the anchor text. This helps the siamese network model learn the similarities between the two texts.
+
+3. Negative — This is a different text from the above two similar text pairs. This helps our model learn dissimilarities with anchor texts.
+
+![image](https://github.com/inhoi/Siamese-Network/assets/76868046/6e427c22-f688-471c-8266-520f8aab0daf)
+
+* a represents an anchor text.
+* p represents a positive text, similar to the anchor.
+* n represents a negative text, dissimilar to the anchor.
+* d(a,p) denotes the distance between the anchor and the positive text embeddings.
+* d(a,n) denotes the distance between the anchor and the negative text embeddings.
+* margin is a hyperparameter that specifies how much farther the negative example's embedding should be from the anchor's embedding compared to the positive example's embedding.
+
